@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { type } from 'os';
 
 const messageSchema = new mongoose.Schema(
   {
@@ -10,6 +11,18 @@ const messageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    receiver:{
+       type:String
+    },
+    createdAt:{
+        type:Date,
+        default:Date.now
+    },
+    room:{
+      type:String,
+      default:null
+    }
   },
   {
     timestamps: true,

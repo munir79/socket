@@ -1,32 +1,56 @@
-import { Message } from "./module/message/message.model.js";
-
 // src/socket.js
+
+import { Message } from './module/message/message.model.js';
+
+// Track all connected users
+const connectedUsers = {}; // { username: socket.id }
+
 export default function socketHandler(io) {
-    // যখন কোনো client connect করবে
-
   io.on('connection', (socket) => {
-    console.log(' User connected:', socket.id);
+    console.log('New user connected:', socket.id);
 
-    // 🔥 Custom event: client থেকে message পাঠানো
-
-    socket.on('send_message',async (data) => {
-      console.log(' Received message in server:', data);
-
-      //save mesaeg in database 
-
-      const newMessage=await Message.create({
-        user:data.user,
-        text:data.text
-      })
-      console.log("new message ",newMessage);
-      // broadcast to all connected clients
-      io.emit('receive_message', data);
+    // Register user when they connect
+    socket.on('register_user', (username) => {
+      connectedUsers[username] = socket.id;
+      console.log(`${username} registered with socket ID: ${socket.id}`);
     });
 
-        // যখন client disconnect হবে
+    //Send private message to a specific user
+    socket.on('private_message', async (data) => {
+      const { sender, receiver, text } = data;
 
+      // receiver socket id
+      const receiverSocketId = connectedUsers[receiver];
+
+      if (receiverSocketId) {
+        // Save message in database
+        const message = new Message({ user: sender, text });
+        await message.save();
+
+        // Send message to receiver only
+        io.to(receiverSocketId).emit('receive_private_message', {
+          from: sender,
+          text,
+        });
+
+        console.log(` ${sender} → ${receiver}: ${text}`);
+      } else {
+        console.log(` Receiver ${receiver} not online.`);
+      }
+    });
+
+    //  Handle disconnect
     socket.on('disconnect', () => {
       console.log(' User disconnected:', socket.id);
+
+      // remove from connected users
+      for (const user in connectedUsers) {
+        if (connectedUsers[user] === socket.id) {
+          delete connectedUsers[user];
+          console.log(`👋 ${user} logged out.`);
+          break;
+        }
+      }
     });
   });
 }

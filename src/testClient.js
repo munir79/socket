@@ -1,29 +1,32 @@
-import { io } from 'socket.io-client';
+// src/testClient.js
+import { io } from "socket.io-client";
 
-//  connect to the backend
+// Create two separate clients
+const userA = io("http://localhost:5000");
+const userB = io("http://localhost:5000");
 
-const socket = io('http://localhost:5000');
+//  User A connects
+userA.on("connect", () => {
+  console.log("User A connected:", userA.id);
+  userA.emit("register_user", "Munir");
 
-// console log if connection successfull
-
-socket.on('connect', () => {
-  console.log('connected to the server', socket.id);
-
-  // now send message in server
-  socket.emit('send_message', {
-    user: 'Munir',
-    text: ' hello 00  from test client',
-  });
+  // Send message to B after 3s
+  setTimeout(() => {
+    userA.emit("private_message", {
+      sender: "Munir",
+      receiver: "Rafi",
+      text: "Hello Rafi!",
+    });
+  }, 3000);
 });
 
-// if messge from server then console log
-
-socket.on('receive_message', (data) => {
-  console.log(' message from the server', data);
+//  User B connects
+userB.on("connect", () => {
+  console.log("User B connected:", userB.id);
+  userB.emit("register_user", "Rafi");
 });
 
-// disconnect
-
-socket.on('disconnect', () => {
-  console.log(' disconnect from the server ');
+//  User B receives private message
+userB.on("receive_private_message", (data) => {
+  console.log("Private message received:", data);
 });
