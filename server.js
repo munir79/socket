@@ -2,7 +2,6 @@ import http from 'http';
 
 import { Server } from 'socket.io';
 import app from './app.js';
-import socketHandler from './src/socket.js';
 import dotenv from 'dotenv';
 import connectDB from './src/config/db.js';
 
@@ -22,9 +21,30 @@ const io = new Server(server, {
   },
 });
 
-// handle socket connection
+//socket setup 
 
-socketHandler(io);
+io.on('connection',(socket)=>{
+  console.log('user connected',socket.id);
+
+  socket.on('joinRoom',(roomId)=>{
+    socket.join(roomId)
+  })
+
+
+  socket.on('sendMessage',(data)=>{
+    const {roomId,message}=data;
+    io.to(roomId).emit('receiveMessage',message);
+  })
+
+
+  socket.on('disconnect',()=>{
+    console.log("User disconnected",socket.id)
+  })
+
+
+})
+
+// handle socket connection
 
 // start server
 
