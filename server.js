@@ -23,25 +23,24 @@ const io = new Server(server, {
 
 //socket setup 
 
-io.on('connection',(socket)=>{
-  console.log('user connected',socket.id);
+//socket events
 
-  socket.on('joinRoom',(roomId)=>{
-    socket.join(roomId)
+io.on("connection",(socket)=>{
+  console.log("new user connected",socket,id);
+
+  //Event "receiving message data from client"
+  socket.on("send_message",(data)=>{
+    console.log("received",data);
+
+    // sending back to the client 
+    socket.emit("receive_message",{message:"Message received",data})
+  });
+
+  // client disconnect
+
+  socket.on("disconnect",()=>{
+    console.log("user disConnected",socket.id);
   })
-
-
-  socket.on('sendMessage',(data)=>{
-    const {roomId,message}=data;
-    io.to(roomId).emit('receiveMessage',message);
-  })
-
-
-  socket.on('disconnect',()=>{
-    console.log("User disconnected",socket.id)
-  })
-
-
 })
 
 // handle socket connection
