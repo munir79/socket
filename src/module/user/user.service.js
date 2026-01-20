@@ -1,10 +1,9 @@
 import bcrypt from "bcryptjs";
-import userModel from "./user.model.js";
-
+import { User } from "./user.model.js";
 const createUserSerVice = async (data) => {
   const { name, email, password } = data;
 
-  const existing = await userModel.findOne({ email });
+  const existing = await User.findOne({ email });
   if (existing) throw new Error("User already exists");
 
   const hashed = await bcrypt.hash(password, 10);

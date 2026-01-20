@@ -47,11 +47,13 @@
 // // startSerevr();
 
 
+import dotenv from "dotenv";
 
 import http from "http";
 import { Server } from "socket.io";
-import connectDB from "./config/db.js";
 import app from "./app.js";
+import connectDB from "./src/config/db.js";
+import initSocket from "./src/socket/socket.js";
 
 dotenv.config();
 connectDB();
@@ -62,9 +64,12 @@ const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-io.on("connection", (socket) => {
-  console.log("🔌 Socket connected:", socket.id);
-});
+// io.on("connection", (socket) => {
+//   console.log("🔌 Socket connected:", socket.id);
+// });
+
+
+initSocket(io);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
