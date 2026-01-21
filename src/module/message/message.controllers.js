@@ -1,40 +1,85 @@
-import { MessageServie } from "./message.service.js";
 
-const sendMessageControllers=async(req,res,next)=>{
+import { MessageSerive } from "./message.service.js";
+
+export const createMessageControllers=async(req,res,next)=>{
     try{
-     const sender=req.user.userId;
-     const {receiver,content}=req.body;
+       const {conversationId,content}=req.body;
 
-     const message=await MessageServie.createMessage({sender,receiver,content});
-     res.status(201).json({
-        success:true,
-        mesage:'message send successfully',
-        data:message
+       const sender=req.user._id;
 
-     })
-    }
-    catch(err){
-        next(err)
-    }
-}
+       if(!conversationId || !content){
+        return res.status(400).json({
+            success:false,
+            message:" conversation and content are required"
+        })
+       };
 
-const getMessageControllers=async(req,res,next)=>{
-    try{
-    const userId=req.user.userId;;
-    const {otherUserId}=req.params;
-    
-    const message=await MessageServie.getUserMessage(userId,otherUserId);
+
+       const message=await MessageSerive.createMesasgeInDb({
+        conversationId,sender,content
+       });
+
 
        res.status(201).json({
         success:true,
-        mesage:'message frtched  successfully',
+        message:'messagfe send successfully',
         data:message
+       })
 
-     })
     }
     catch(err){
         next(err)
     }
 }
 
-export const messageControllers={sendMessageControllers,getMessageControllers}
+const getMessageControlleers=async(req,res,next)=>{
+    try{
+     const {conversationId}=req.params;
+      console.log("cnv",conversationId);
+
+     if(!conversationId){
+        return res.status(400).json({
+            success:false,
+            message:'conversation id is required'
+        })
+     }
+
+     const message=await MessageSerive.getMessage(conversationId);
+     console.log("message from get msg controllers",message);
+     
+     res.status(201).json({
+        success:true,
+        message:"message  fetched succesfully",
+        data:message
+     })
+    }
+    catch(err){
+        next(err);
+    }
+}
+
+
+export const MessageControllers={createMessageControllers,getMessageControlleers}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

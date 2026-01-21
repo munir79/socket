@@ -1,28 +1,26 @@
+import { Conversation } from "../conversation/conversation.model.js"
 import { Message } from "./message.model.js"
 
-const createMessage=async({sender,receiver,content})=>{
-
-    console.log("from service",sender,receiver,content);
+const createMesasgeInDb=async({ conversationId, sender, content })=>{
     const message=await Message.create({
-        sender,
-        receiver,
-        content
-    });
+       conversationId, sender,content
+    })
 
-    return message
+    await Conversation.findByIdAndUpdate(conversationId,{
+        lastMessage:content,
+        updatedAt:new Date()
+    })
+
+    return message;
+}
+
+//get message 
+
+export const getMessage=async(conversationId)=>{
+  const result=await  Message.find({conversationId}).sort({ createdAt: 1 });
+  return result
+
 }
 
 
-const getUserMessage=async(userId,otherUserID)=>{
-    const  message=await Message.find({
-        $or:[
-            {sender:userId ,receiver:otherUserID},
-            {sender:otherUserID,receiver:userId}
-        ]
-    }).sort({createdAt:1});
-
-    return message
-};
-
-
-export const MessageServie={createMessage,getUserMessage}
+export const MessageSerive={createMesasgeInDb,getMessage};

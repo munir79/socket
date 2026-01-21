@@ -1,5 +1,7 @@
+
 import registerBaseHandelers from "./handelers/base.handeler.js";
-import registerMessageHandlers from "./handelers/message.handler.js";
+import registarConversationHandelers from "./handelers/conversationHandelers.js";
+import registerMessageHandlers from "./handelers/messageHandelers.js";
 import socketAuth from "./socketAuth.js"
 
 const initSocket=(io)=>{
@@ -11,7 +13,8 @@ const initSocket=(io)=>{
         console.log(" Authentic Socket",socket.id);
 
         registerBaseHandelers(io,socket);
-         registerMessageHandlers(io,socket);
+        registarConversationHandelers(io,socket);
+        registerMessageHandlers(io,socket);
     });
 
 

@@ -1,12 +1,12 @@
 
 import express from "express";
 import { protect } from "../../middleware/auth.js";
-import { messageControllers } from "./message.controllers.js";
+import { MessageControllers } from "./message.controllers.js";
 
 
 const router = express.Router();
 
-router.post("/send",protect,messageControllers.sendMessageControllers);
-router.get("get-message/:otherUserId", protect, messageControllers.getMessageControllers);
+router.post("/send",protect,MessageControllers.createMessageControllers);
+router.get("/get-message/:conversationId", protect, MessageControllers.getMessageControlleers);
 
 export  const MessageRouter= router;
