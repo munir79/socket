@@ -19,28 +19,22 @@ const registerMessageHandlers = (io, socket) => {
       //2.emit to all active users in this conversation
       io.to(conversationId).emit('receiveMessage', message);
 
-      //3.Notify other conversation members
+     
 
-      // const conversation = await Conversation.findById(conversationId);
+  // 3️ Emit notification to receiver if they are online
+  const conversation=await Conversation.findById(conversationId);
+  const othersMembers=conversation.members.filter((id)=>id.toString() !==sender.toString());
 
-      // const otherMembers = conversation.members.filter((id) => id.toString() !== sender.toString());
-
-      // otherMembers.forEach((userId) => {
-      //   const socketId = connectedUsers.get(userId.toString());
-      //   if (socketId) {
-      //     io.to(socketId).emit('newMessageNotification', {
-      //       conversationId,
-      //       message,
-      //     });
-      //   }
-      // });
-
-  // 3️⃣ Emit notification to receiver if they are online
-
-  const receiverSocketId=connectedUsers.get(receiverId);
-  if(receiverSocketId && receiverSocketId !==socket.id){
-    io.to(receiverSocketId).emit("newMessageNotification",{})
-  }
+  othersMembers.forEach((userId)=>{
+    const socketId=connectedUsers.get(userId.toString());
+    if(socketId){
+      io.to(socketId).emit('newMessageNotification',{
+        conversationId,
+        message
+      })
+    }
+  })
+  
 
     } catch (err) {
       console.log('sendMessage error', err.message);
