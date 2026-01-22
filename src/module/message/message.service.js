@@ -17,7 +17,7 @@ const createMesasgeInDb=async({ conversationId, sender, content })=>{
 //get message 
 
 export const getMessage=async(conversationId)=>{
-  const result=await  Message.find({conversationId}).sort({ createdAt: 1 });
+  const result=await  Message.find({conversationId}).sort({ createdAt: 1 }).populate('sender','name');
   return result
 
 }

@@ -2,6 +2,7 @@
 import registerBaseHandelers from "./handelers/base.handeler.js";
 import registarConversationHandelers from "./handelers/conversationHandelers.js";
 import registerMessageHandlers from "./handelers/messageHandelers.js";
+import registerTypingHandelers from "./handelers/typing.handelers.js";
 import socketAuth from "./socketAuth.js"
 
 const initSocket=(io)=>{
@@ -15,6 +16,7 @@ const initSocket=(io)=>{
         registerBaseHandelers(io,socket);
         registarConversationHandelers(io,socket);
         registerMessageHandlers(io,socket);
+        registerTypingHandelers(io,socket);  // typing indicator 
     });
 
 
